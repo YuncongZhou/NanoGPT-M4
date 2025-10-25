@@ -1,0 +1,43 @@
+# Tiny Shakespeare model configuration - optimized for M4 MacBook Air
+model:
+  n_layer: 6
+  n_head: 6
+  n_embd: 384
+  dropout: 0.2
+  block_size: 256
+  bias: false
+
+training:
+  batch_size: 12
+  learning_rate: 3e-4
+  max_iters: 5000
+  warmup_iters: 100
+  eval_interval: 500
+  eval_iters: 50
+  gradient_accumulation_steps: 4
+  weight_decay: 0.1
+  beta1: 0.9
+  beta2: 0.95
+  grad_clip: 1.0
+  decay_lr: true
+  lr_decay_iters: 5000
+  min_lr: 6e-5
+
+device:
+  type: mps
+  mixed_precision: false
+  compile: false
+
+data:
+  dataset: shakespeare
+  tokenizer_type: character
+
+logging:
+  log_interval: 10
+  save_interval: 1000
+
+output:
+  out_dir: checkpoints/tiny_shakespeare
+  always_save_checkpoint: false
+
+seed: 1337

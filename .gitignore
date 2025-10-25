@@ -120,7 +120,6 @@ dmypy.json
 cython_debug/
 
 # Matplotlib
-*.png
 *.jpg
 *.jpeg
 *.gif

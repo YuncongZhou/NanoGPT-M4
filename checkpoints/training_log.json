@@ -1,0 +1,98 @@
+{
+  "config": {
+    "model": {
+      "n_layer": 6,
+      "n_head": 6,
+      "n_embd": 384,
+      "dropout": 0.2,
+      "block_size": 256,
+      "bias": false
+    },
+    "training": {
+      "batch_size": 12,
+      "learning_rate": "3e-4",
+      "max_iters": 5000,
+      "warmup_iters": 100,
+      "eval_interval": 500,
+      "eval_iters": 50,
+      "gradient_accumulation_steps": 4,
+      "weight_decay": 0.1,
+      "beta1": 0.9,
+      "beta2": 0.95,
+      "grad_clip": 1.0,
+      "decay_lr": true,
+      "lr_decay_iters": 5000,
+      "min_lr": "6e-5"
+    },
+    "device": {
+      "type": "mps",
+      "mixed_precision": false,
+      "compile": false
+    },
+    "data": {
+      "dataset": "shakespeare",
+      "tokenizer_type": "character"
+    },
+    "logging": {
+      "log_interval": 10,
+      "save_interval": 1000
+    },
+    "output": {
+      "out_dir": "checkpoints/tiny_shakespeare",
+      "always_save_checkpoint": false
+    },
+    "seed": 1337,
+    "max_iters": 1000,
+    "out_dir": "checkpoints",
+    "eval_interval": 250,
+    "log_interval": 10,
+    "eval_iters": 50,
+    "eval_only": false,
+    "always_save_checkpoint": false,
+    "init_from": "scratch",
+    "dataset": "shakespeare",
+    "gradient_accumulation_steps": 1,
+    "batch_size": 12,
+    "block_size": 256,
+    "n_layer": 6,
+    "n_head": 6,
+    "n_embd": 384,
+    "dropout": 0.2,
+    "bias": false,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "decay_lr": true,
+    "warmup_iters": 100,
+    "lr_decay_iters": 5000,
+    "min_lr": 6e-05,
+    "tokenizer_type": "character",
+    "compile": false
+  },
+  "final_train_loss": 2.082500457763672,
+  "final_val_loss": 2.154884099960327,
+  "best_val_loss": 2.154884099960327,
+  "total_iterations": 1000,
+  "loss_history": {
+    "train": [
+      4.287270545959473,
+      2.447868824005127,
+      2.262532949447632,
+      2.082500457763672
+    ],
+    "val": [
+      4.280451774597168,
+      2.4735217094421387,
+      2.2982017993927,
+      2.154884099960327
+    ],
+    "iters": [
+      0,
+      250,
+      500,
+      750
+    ]
+  }
+}

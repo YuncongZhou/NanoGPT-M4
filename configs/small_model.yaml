@@ -1,0 +1,43 @@
+# Small model configuration - for testing
+model:
+  n_layer: 4
+  n_head: 4
+  n_embd: 128
+  dropout: 0.1
+  block_size: 128
+  bias: false
+
+training:
+  batch_size: 16
+  learning_rate: 5e-4
+  max_iters: 2000
+  warmup_iters: 50
+  eval_interval: 200
+  eval_iters: 25
+  gradient_accumulation_steps: 2
+  weight_decay: 0.01
+  beta1: 0.9
+  beta2: 0.95
+  grad_clip: 1.0
+  decay_lr: true
+  lr_decay_iters: 2000
+  min_lr: 1e-4
+
+device:
+  type: mps
+  mixed_precision: false
+  compile: false
+
+data:
+  dataset: shakespeare
+  tokenizer_type: character
+
+logging:
+  log_interval: 10
+  save_interval: 500
+
+output:
+  out_dir: checkpoints/small_model
+  always_save_checkpoint: false
+
+seed: 1337
