@@ -1,0 +1,135 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# PyCharm
+.idea/
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Model checkpoints (optional - comment out if you want to track small checkpoints)
+# checkpoints/
+# *.pt
+# *.pth
+
+# Training logs
+logs/*.json
+logs/*.log
+*.log
+
+# Tensorboard
+runs/
+events.out.tfevents.*
+
+# Weights & Biases
+wandb/
+
+# Data files (keep the directory but not large datasets)
+# Uncomment if you don't want to track the data
+# data/*.txt
+# data/*.csv
+# data/*.json
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# Matplotlib
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.pdf
+# Keep documentation images
+!docs/*.png
+!docs/*.jpg
+
+# Model outputs (optional - remove if you want to track sample outputs)
+outputs/
+generated/
+samples/
