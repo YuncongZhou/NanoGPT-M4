@@ -12,6 +12,7 @@ A complete implementation of nanoGPT optimized for Apple Silicon M4 MacBook Air 
 - ✅ Interactive text generation
 - ✅ Comprehensive test suite
 - ✅ Training visualization and logging
+- ✅ **NEW**: Ablation studies support (GELU vs SwiGLU, LayerNorm vs TanhNorm)
 
 ## Quick Start
 
@@ -102,6 +103,20 @@ nanogpt-m4/
 - **Training time**: ~8 hours
 - **Memory**: ~20GB
 - **Config**: `configs/large_model.yaml`
+
+## Ablation Studies
+
+Run architectural comparison experiments:
+
+```bash
+# Compare activation functions (GELU vs SwiGLU)
+python ablation_simple.py
+
+# Compare normalization methods (LayerNorm vs TanhNorm)
+python ablation_normalization.py
+```
+
+See [ABLATION_GUIDE.md](ABLATION_GUIDE.md) for detailed information about ablation features.
 
 ## Training Examples
 

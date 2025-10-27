@@ -16,6 +16,9 @@ class GPTConfig:
     dropout: float = 0.1
     bias: bool = True
     device: str = "mps" if torch.backends.mps.is_available() else "cpu"
+    activation: str = "gelu"  # "gelu" or "swiglu"
+    norm_type: str = "layernorm"  # "layernorm" or "tanhnorm"
+    norm_alpha: float = 0.5  # Alpha parameter for tanh normalization (paper default)
 
 
 class LayerNorm(nn.Module):
@@ -26,6 +29,26 @@ class LayerNorm(nn.Module):
 
     def forward(self, input):
         return F.layer_norm(input, self.weight.shape, self.weight, self.bias, 1e-5)
+
+
+class TanhNorm(nn.Module):
+    """
+    Dynamic Tanh (DyT) normalization from 'Transformers without Normalization'.
+    Implements: DyT(x) = γ * tanh(α * x) + β
+    where α is a learnable scalar, γ and β are learnable per-channel vectors.
+    """
+    def __init__(self, ndim, alpha=0.5):
+        super().__init__()
+        # Alpha is a learnable SCALAR parameter
+        self.alpha = nn.Parameter(torch.tensor(alpha))
+        # Gamma (scale) and Beta (shift) are per-channel parameters, like LayerNorm
+        self.gamma = nn.Parameter(torch.ones(ndim))
+        self.beta = nn.Parameter(torch.zeros(ndim))
+
+    def forward(self, x):
+        # Apply tanh normalization with scale and shift
+        x_normalized = torch.tanh(self.alpha * x)
+        return self.gamma * x_normalized + self.beta
 
 
 class CausalSelfAttention(nn.Module):
@@ -66,15 +89,31 @@ class CausalSelfAttention(nn.Module):
 class MLP(nn.Module):
     def __init__(self, config):
         super().__init__()
-        self.c_fc = nn.Linear(config.n_embd, 4 * config.n_embd, bias=config.bias)
-        self.gelu = nn.GELU()
-        self.c_proj = nn.Linear(4 * config.n_embd, config.n_embd, bias=config.bias)
+        self.config = config
+        if config.activation == "swiglu":
+            # SwiGLU uses 3 linear projections
+            self.w1 = nn.Linear(config.n_embd, 4 * config.n_embd, bias=config.bias)
+            self.w2 = nn.Linear(config.n_embd, 4 * config.n_embd, bias=config.bias)
+            self.w3 = nn.Linear(4 * config.n_embd, config.n_embd, bias=config.bias)
+        else:
+            # Standard GELU MLP
+            self.c_fc = nn.Linear(config.n_embd, 4 * config.n_embd, bias=config.bias)
+            self.c_proj = nn.Linear(4 * config.n_embd, config.n_embd, bias=config.bias)
+            self.gelu = nn.GELU()
         self.dropout = nn.Dropout(config.dropout)
 
     def forward(self, x):
-        x = self.c_fc(x)
-        x = self.gelu(x)
-        x = self.c_proj(x)
+        if self.config.activation == "swiglu":
+            # SwiGLU: (Swish(W1(x)) * W2(x)) -> W3
+            x1 = self.w1(x)
+            x2 = self.w2(x)
+            hidden = F.silu(x1) * x2  # SiLU is also known as Swish
+            x = self.w3(hidden)
+        else:
+            # Standard GELU path
+            x = self.c_fc(x)
+            x = self.gelu(x)
+            x = self.c_proj(x)
         x = self.dropout(x)
         return x
 
@@ -82,9 +121,15 @@ class MLP(nn.Module):
 class Block(nn.Module):
     def __init__(self, config):
         super().__init__()
-        self.ln_1 = LayerNorm(config.n_embd, bias=config.bias)
+        # Choose normalization type
+        if config.norm_type == "tanhnorm":
+            self.ln_1 = TanhNorm(config.n_embd, alpha=config.norm_alpha)
+            self.ln_2 = TanhNorm(config.n_embd, alpha=config.norm_alpha)
+        else:
+            self.ln_1 = LayerNorm(config.n_embd, bias=config.bias)
+            self.ln_2 = LayerNorm(config.n_embd, bias=config.bias)
+
         self.attn = CausalSelfAttention(config)
-        self.ln_2 = LayerNorm(config.n_embd, bias=config.bias)
         self.mlp = MLP(config)
 
     def forward(self, x):
@@ -100,13 +145,19 @@ class GPT(nn.Module):
         assert config.block_size is not None
         self.config = config
 
+        # Choose final normalization
+        if config.norm_type == "tanhnorm":
+            final_norm = TanhNorm(config.n_embd, alpha=config.norm_alpha)
+        else:
+            final_norm = LayerNorm(config.n_embd, bias=config.bias)
+
         self.transformer = nn.ModuleDict(
             dict(
                 wte=nn.Embedding(config.vocab_size, config.n_embd),
                 wpe=nn.Embedding(config.block_size, config.n_embd),
                 drop=nn.Dropout(config.dropout),
                 h=nn.ModuleList([Block(config) for _ in range(config.n_layer)]),
-                ln_f=LayerNorm(config.n_embd, bias=config.bias),
+                ln_f=final_norm,
             )
         )
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
